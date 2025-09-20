@@ -1,0 +1,106 @@
+﻿<Application x:Class="MacroTalk.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:MacroTalk" 
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
+             StartupUri="MainWindow.xaml"
+             Startup="Application_Startup"
+             Exit="Application_Exit">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        
+            <Storyboard x:Key="MenuBar1Animation" Storyboard.TargetProperty="RenderTransform.RotateTransform.Angle">
+                <DoubleAnimationUsingKeyFrames>
+                    <EasingDoubleKeyFrame KeyTime="0:0:30" Value="0"/>
+                    <EasingDoubleKeyFrame KeyTime="0:1:00" Value="90">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <QuadraticEase EasingMode="EaseOut"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+        
+            <FontFamily x:Key="Font_Main">/Resources/MapleMono-CN-Medium.ttf#Maple Mono CN Medium</FontFamily>
+
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontFamily" Value="{StaticResource Font_Main}"/>
+            </Style>
+
+            <TextBlock x:Key="Element_ContentNormal" TextWrapping="Wrap" Margin="8"/>
+            <Image x:Key="Element_ContentImage" Margin="8"/>
+            <mdxam:MarkdownScrollViewer x:Key="Element_ContentMarkdown" Margin="8"/>
+            <RichTextBox x:Key="Element_ContentRichText" IsReadOnly="True" Margin="8"/>
+
+            <Grid x:Key="Element_Normal">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="96"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48"/>
+                    <RowDefinition Height="48"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Border Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16" Background="#FFFFC1D6" BorderBrush="#FFE384A4" BorderThickness="2" CornerRadius="32">
+                    <Image/>
+                </Border>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Text="Test" FontSize="20" Margin="0,0,0,4"/>
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="#FF4B8BC8" BorderThickness="1" Background="#FFC8E4FF" CornerRadius="8" Margin="0,4,16,0"/>
+            </Grid>
+            <Grid x:Key="Element_NoAvatar">
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Left" BorderBrush="#FF4B8BC8" BorderThickness="1" Background="#FFC8E4FF" CornerRadius="8" Margin="96,0,32,0"/>
+            </Grid>
+            <Grid x:Key="Element_Sender">
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Right" BorderBrush="#FF4B8BC8" BorderThickness="1" Background="#FF4B8BC8" CornerRadius="8" Margin="112,0,16,0"/>
+            </Grid>
+            <Grid x:Key="Element_Middle">
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Center" BorderBrush="#FFFC965F" BorderThickness="1" Background="#FFFEFFB7" CornerRadius="8" Margin="112,0"/>
+            </Grid>
+            <Grid x:Key="Element_Mark">
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Center" BorderBrush="#FFE333B6" BorderThickness="1" Background="#FFFFDCEF" CornerRadius="8" Margin="112,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="72"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <iconPacks:PackIconMaterialDesign Kind="Bookmark" Foreground="#FFE333B6" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8"/>
+                        <TextBlock Text="标记：" Foreground="#FFE333B6" HorizontalAlignment="Right" TextWrapping="Wrap" Margin="8,8,0,8"/>
+                        <TextBlock Grid.Column="1" Foreground="#FFE333B6" TextWrapping="Wrap" Margin="0,8,8,8"/>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid x:Key="Element_Custom">
+                <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Center" BorderBrush="#FFE333B6" BorderThickness="1" Background="#FFFFDCEF" CornerRadius="8" Margin="112,0">
+                    <StackPanel/>
+                </Border>
+            </Grid>
+            <Grid x:Key="Element_Custom_Title">
+                <TextBlock HorizontalAlignment="Center" Foreground="#FFE333B6" Margin="0,2"/>
+            </Grid>
+            <Grid x:Key="Element_Custom_Profile">
+                <Grid Margin="8,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="64"/>
+                    </Grid.RowDefinitions>
+                    <Image Grid.RowSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4"/>
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FFE333B6" Margin="4"/>
+                </Grid>
+            </Grid>
+            <Grid x:Key="Element_Custom_KeyValue">
+                <TextBlock Foreground="#FFE333B6" Margin="0,2"/>
+            </Grid>
+            <Grid x:Key="Element_Custom_Indent">
+                <StackPanel Margin="8,2"/>
+            </Grid>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

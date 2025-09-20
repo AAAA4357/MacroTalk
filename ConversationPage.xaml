@@ -1,0 +1,741 @@
+﻿<Page x:Class="MacroTalk.ConversationPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MacroTalk"
+      xmlns:hc="https://handyorg.github.io/handycontrol"
+      xmlns:dd="urn:gong-wpf-dragdrop" 
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
+      mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance Type=local:ConversationPageViewModel}"
+      Title="ConversationPage"
+      Focusable="True"
+      d:Width="820" d:Height="1660"
+      MouseDown="Page_MouseDown">
+    <Page.Resources>
+        <local:DialogueElementConverter x:Key="DialogueElementConverter"/>
+        <local:Uri2ImageConverter x:Key="Uri2ImageConverter"/>
+    </Page.Resources>
+    <Page.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="Z" CommandTarget="{Binding RelativeSource={RelativeSource Self}}" Command="{Binding UndoDialogueCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoDialogueCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveConversationCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding LoadConversationCommand}"/>
+    </Page.InputBindings>
+    <Grid Background="#F0F0F0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Grid.RowSpan="2" Background="White" Margin="8" CornerRadius="12">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="0" BlurRadius="15" Opacity="0.2" Color="Gray"/>
+            </Border.Effect>
+            <ListBox x:Name="ConversationList" SelectedIndex="{Binding SelectedDialogueIndex}" BorderBrush="Gray" hc:BorderElement.CornerRadius="4" dd:DragDrop.IsDropTarget="True" dd:DragDrop.IsDragSource="True" dd:DragDrop.DropHandler="{Binding DropHandler}" HorizontalContentAlignment="Stretch" dd:DragDrop.DragDropContext="DialogueDrag" Margin="8" ItemsSource="{Binding DialogueList, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <ContentPresenter Content="{Binding Converter={StaticResource DialogueElementConverter}, ConverterParameter=False}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+        <Border Grid.Column="1" Background="White" Margin="8" CornerRadius="12">
+            <Border.RenderTransform>
+                <TranslateTransform Y="2"/>
+            </Border.RenderTransform>
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="0" BlurRadius="15" Opacity="0"/>
+            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.Y)">
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0" Value="2">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)">
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="0.2"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.Y)">
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseIn"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="2">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseIn"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)">
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0.2"/>
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="工具模式" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="1" FontSize="16" SelectedIndex="{Binding SelectedToolModeIndex}" Height="33" VerticalAlignment="Top" Margin="9,0">
+                    <ComboBoxItem>编辑模式</ComboBoxItem>
+                    <ComboBoxItem>预览模式</ComboBoxItem>
+                    <ComboBoxItem>导出模式</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+        </Border>
+        <Border x:Name="ToolBorder" Grid.Row="1" Grid.Column="1" Background="White" Margin="8" CornerRadius="12">
+            <Border.RenderTransform>
+                <TranslateTransform Y="2"/>
+            </Border.RenderTransform>
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="0" BlurRadius="15" Opacity="0"/>
+            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.Y)">
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0" Value="2">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)">
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="0.2"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.Y)">
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseIn"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="2">
+                                                <EasingDoubleKeyFrame.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseIn"/>
+                                                </EasingDoubleKeyFrame.EasingFunction>
+                                            </EasingDoubleKeyFrame>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)">
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0.2"/>
+                                            <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <ScrollViewer>
+                <Grid>
+                    <StackPanel x:Name="EditPanel" Margin="0,8,0,0">
+                        <TextBlock Text="编辑工具" FontSize="22.727" HorizontalAlignment="Center" Margin="4"/>
+                        <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="38"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="选择类型" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <ListBox Grid.Row="1" hc:BorderElement.CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}" SelectedIndex="{Binding SelectedDialogueTypeIndex}" Padding="2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconUnicons Kind="CommentAltLines" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="普通对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconUnicons Kind="CommentAltMessage" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="己方对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconUnicons Kind="CommentAlt" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="旁白对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconUnicons Kind="CommentAltExclamation" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="标记对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconLucide Kind="MessageCircleReply" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="回复对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconLucide Kind="MessageCircleHeart" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="羁绊对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                    <ListBoxItem Margin="4" hc:BorderElement.CornerRadius="4" HorizontalContentAlignment="Center">
+                                        <Grid Margin="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <iconPacks:PackIconLucide Kind="MessageCircleDashed" Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TextBlock}}}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="表情对话" FontSize="15.151" Grid.Column="1" Margin="4"/>
+                                        </Grid>
+                                    </ListBoxItem>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+                        <Border x:Name="Card1" Height="170">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="选择缩进" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border CornerRadius="6" Grid.Row="1" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="36"/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition Height="36"/>
+                                            </Grid.RowDefinitions>
+                                            <hc:ComboBox x:Name="CollapseSelector" Style="{StaticResource ComboBoxCapsule}" SelectedIndex="{Binding SelectedDialogueIndentTypeIndex}" Margin="4">
+                                                <ComboBoxItem>自动缩进</ComboBoxItem>
+                                                <ComboBoxItem>强制缩进</ComboBoxItem>
+                                                <ComboBoxItem>强制不缩进</ComboBoxItem>
+                                            </hc:ComboBox>
+                                            <Border Grid.Row="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="缩进计数：" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15.151" Margin="4"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding DialogueIndentCounter}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" FontSize="15.151" Margin="4"/>
+                                                <Border Grid.Column="2" Background="{DynamicResource PrimaryBrush}"/>
+                                                <TextBlock Grid.Column="3" Text="计数目标：" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15.151" Margin="4"/>
+                                                <hc:NumericUpDown Value="{Binding DialogueIndentTarget}" Grid.Column="4" Minimum="1" Margin="2,3,4,3"/>
+                                            </Grid>
+                                            <Border Grid.Row="3" Background="{DynamicResource PrimaryBrush}"/>
+                                            <Button Grid.Row="4" Command="{Binding ClearIndentCounterClickCommand}" Content="重置计数" HorizontalAlignment="Stretch" Margin="4"/>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card2" Height="360">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="选择角色" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border CornerRadius="6" Grid.Row="1" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <ListBox x:Name="ProfileSelector" ItemsSource="{Binding ProfileList}" IsEnabled="False" ScrollViewer.CanContentScroll="False" VirtualizingPanel.ScrollUnit="Pixel" SelectedIndex="{Binding SelectedProfileIndex}" Margin="4">
+                                                <ListBox.ItemContainerStyle>
+                                                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ListBoxItemBaseStyle}">
+                                                        <Setter Property="Padding" Value="4"/>
+                                                    </Style>
+                                                </ListBox.ItemContainerStyle>
+                                                <ListBox.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ListBox.ItemsPanel>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Height="100">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="70"/>
+                                                                <RowDefinition Height="30"/>
+                                                            </Grid.RowDefinitions>
+                                                            <Image Source="{Binding FirstImage}" Margin="4"/>
+                                                            <TextBlock Grid.Row="1" Text="{Binding Name}" HorizontalAlignment="Center" FontSize="17" Margin="4"/>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <TextBlock Text="请添加一个档案" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Visibility="{Binding HasItems, ElementName=ProfileSelector, Converter={StaticResource Boolean2VisibilityReConverter}}"/>
+                                            <Border Grid.Row="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            <ListBox x:Name="SkinSelector" ItemsSource="{Binding ProfileSkinList}" IsEnabled="False" Grid.Row="2" ScrollViewer.CanContentScroll="False" VirtualizingPanel.ScrollUnit="Pixel" SelectedIndex="{Binding SelectedProfileSkinIndex}" Margin="4">
+                                                <ListBox.ItemContainerStyle>
+                                                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ListBoxItemBaseStyle}">
+                                                        <Setter Property="Padding" Value="4"/>
+                                                    </Style>
+                                                </ListBox.ItemContainerStyle>
+                                                <ListBox.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ListBox.ItemsPanel>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Image Width="50" Height="50" Source="{Binding Image}" Margin="8"/>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <TextBlock Text="请选择一个人物" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Visibility="{Binding HasItems, ElementName=SkinSelector, Converter={StaticResource Boolean2VisibilityReConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card3" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="选择表情差分" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <ListBox x:Name="FaceSelector" ScrollViewer.CanContentScroll="False" VirtualizingPanel.ScrollUnit="Pixel" hc:BorderElement.CornerRadius="6" Grid.Row="1" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}" SelectedIndex="{Binding SelectedProfileFaceIndex}">
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel IsItemsHost="True" MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorLevel=1, AncestorType={x:Type ListBox}}}"/>
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                    </ListBox>
+                                    <TextBlock Text="请选择一个人物" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Visibility="{Binding HasItems, ElementName=FaceSelector, Converter={StaticResource Boolean2VisibilityReConverter}}"/>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card4" Height="360">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="编辑内容" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="36"/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition Height="52"/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition Height="36"/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <ComboBox Style="{StaticResource ComboBoxCapsule}" SelectedIndex="{Binding SelectedContentTypeIndex}" Margin="4">
+                                                <ComboBoxItem>图片</ComboBoxItem>
+                                                <ComboBoxItem>普通文本</ComboBoxItem>
+                                                <ComboBoxItem>Markdown文本</ComboBoxItem>
+                                                <ComboBoxItem>富文本</ComboBoxItem>
+                                            </ComboBox>
+                                            <Border Grid.Row="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            <hc:ImageSelector IsEnabled="False" Name="ImageSelector" Filter="图片文件|*.jpg;*.png" Grid.Row="2" Margin="4" ImageSelected="ImageSelector_ImageSelected" ImageUnselected="ImageSelector_ImageUnselected"/>
+                                            <Border Grid.Row="3" Background="{DynamicResource PrimaryBrush}"/>
+                                            <Button x:Name="RichButton" IsEnabled="False" Grid.Row="4" Content="启用富文本编辑器" HorizontalAlignment="Stretch" Margin="4"/>
+                                            <Border Grid.Row="5" Background="{DynamicResource PrimaryBrush}"/>
+                                            <TextBox x:Name="PlainTextbox" Text="{Binding MainContent, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" VerticalContentAlignment="Top" Grid.Row="6" Margin="4" Padding="4"/>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card5" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="图片预览" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <Border BorderBrush="{DynamicResource BorderBrush}" CornerRadius="4" BorderThickness="1" Margin="4">
+                                            <Image Height="150" Source="{Binding Uri,ElementName=ImageSelector, Converter={StaticResource Uri2ImageConverter}}"/>
+                                        </Border>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card6" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="Markdown预览" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <Border BorderBrush="{DynamicResource BorderBrush}" CornerRadius="4" BorderThickness="1" Margin="4">
+                                            <mdxam:MarkdownScrollViewer Markdown="{Binding Text, ElementName=PlainTextbox}"  Height="150"/>
+                                        </Border>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card7" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="富文本预览" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <RichTextBox IsReadOnly="True" Height="150" Margin="4"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card8" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="编辑回复" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition Height="1"/>
+                                                <RowDefinition Height="72"/>
+                                            </Grid.RowDefinitions>
+                                            <ListBox Margin="4" ItemsSource="{Binding ReplyList}" SelectedIndex="{Binding SelectedReplyIndex}" ScrollViewer.CanContentScroll="False" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding ReplyDropHandler}" dd:DragDrop.DragDropContext="Reply"/>
+                                            <Border Grid.Row="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition Width="86"/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition Width="86"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition Height="1"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <hc:TextBox Text="{Binding ReplyContent, UpdateSourceTrigger=PropertyChanged}" Grid.RowSpan="3" Margin="4" VerticalContentAlignment="Top" Padding="4"/>
+                                                <Border Grid.Column="1" Grid.RowSpan="3" Background="{DynamicResource PrimaryBrush}"/>
+                                                <Button Grid.Column="2" Content="添加回复" Command="{Binding AddReplyClickCommand}"/>
+                                                <Border Grid.Column="3" Background="{DynamicResource PrimaryBrush}"/>
+                                                <Button Grid.Column="4" Content="移除回复" Command="{Binding RemoveReplyClickCommand}"/>
+                                                <Border Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="1" Background="{DynamicResource PrimaryBrush}"/>
+                                                <hc:DashedBorder Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Margin="4" BorderBrush="{DynamicResource SecondaryBorderBrush}" BorderThickness="1" CornerRadius="2" BorderDashThickness="2" BorderDashArray="3,3" Background="White" dd:DragDrop.IsDragSource="True" dd:DragDrop.DragHandler="{Binding ReplyDragHandler}" dd:DragDrop.DragDropContext="Reply">
+                                                    <dd:DragDrop.DragAdornerTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}"/>
+                                                        </DataTemplate>
+                                                    </dd:DragDrop.DragAdornerTemplate>
+                                                    <TextBlock Text="在此拖动" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                                </hc:DashedBorder>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border x:Name="Card9" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="编辑注释" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <TextBox Text="{Binding MarkNoteContent, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Top" Grid.Row="1" hc:BorderElement.CornerRadius="6" Padding="4" Margin="4,0,4,4"/>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="36"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="添加对话" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="80"/>
+                                            <RowDefinition Height="1"/>
+                                            <RowDefinition Height="80"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="点击添加" FontSize="15.151" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0"/>
+                                        <TextBlock Text="在第" FontSize="15.151" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                        <Viewbox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="42,0,0,0" Height="20">
+                                            <hc:NumericUpDown IsEnabled="{Binding HasItems,ElementName=ConversationList}" Width="68" Minimum="1" Value="{Binding SelectedInsertIndex}" Maximum="{Binding ElementName=ConversationList, Path=Items.Count}"/>
+                                        </Viewbox>
+                                        <TextBlock Text="条" FontSize="15.151" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="92,0,0,0"/>
+                                        <Viewbox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="112,0,0,0" Height="20">
+                                            <hc:ComboBox SelectedIndex="{Binding SelectedInsertTypeIndex}" Width="80" Style="{StaticResource ComboBoxCapsule}">
+                                                <ComboBoxItem>前</ComboBoxItem>
+                                                <ComboBoxItem>后</ComboBoxItem>
+                                            </hc:ComboBox>
+                                        </Viewbox>
+                                        <Button Content="插入" Command="{Binding InsertDialogueClickCommand}" FontSize="10" Padding="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="174,0,4,0" Height="20" hc:BorderElement.CornerRadius="2.5" BorderThickness="0.7"/>
+                                        <Button Content="在最后追加" Command="{Binding AddDialogueClickCommand}" FontSize="10" Padding="2" Height="20" BorderThickness="0.7" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="4,0,4,4"/>
+                                        <Border Grid.Row="1" Background="{DynamicResource PrimaryBrush}"/>
+                                        <TextBlock Grid.Row="2" Text="拖动添加" FontSize="15.151" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,4,0,0"/>
+                                        <hc:DashedBorder Grid.Row="2" Margin="4,28,4,4" BorderBrush="{DynamicResource SecondaryBorderBrush}" BorderThickness="1" CornerRadius="2" BorderDashThickness="2" BorderDashArray="3,3" Background="White" dd:DragDrop.IsDragSource="True" dd:DragDrop.DragHandler="{Binding DragHandler}" dd:DragDrop.DragDropContext="DialogueDrag">
+                                            <dd:DragDrop.DragAdornerTemplate>
+                                                <DataTemplate>
+                                                    <ContentPresenter Content="{Binding Converter={StaticResource DialogueElementConverter}, ConverterParameter=True}"/>
+                                                </DataTemplate>
+                                            </dd:DragDrop.DragAdornerTemplate>
+                                            <TextBlock Text="从此处拖动" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                        </hc:DashedBorder>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel x:Name="PreviewPanel" Visibility="Collapsed" Margin="0,8,0,0">
+                        <TextBlock Text="预览工具" FontSize="22.727" HorizontalAlignment="Center" Margin="4"/>
+                        <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="38"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="生成预览" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <Button Grid.Row="1" Margin="6,0,6,6" HorizontalAlignment="Stretch" Content="点击生成预览"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel x:Name="ExportPanel" Visibility="Collapsed" Margin="0,8,0,0">
+                        <TextBlock Text="导出工具" FontSize="22.727" HorizontalAlignment="Center" Margin="4"/>
+                        <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="38"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="导出参数" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="对话页边距" FontSize="15.151" Margin="4"/>
+                                        <Grid Margin="4,0,4,4" Height="60">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition Height="2"/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <iconPacks:PackIconEvaIcons Kind="ArrowLeft" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryBrush}"/>
+                                            <hc:NumericUpDown Grid.Column="1"/>
+                                            <iconPacks:PackIconEvaIcons Kind="ArrowRight" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryBrush}"/>
+                                            <hc:NumericUpDown Grid.Column="3"/>
+                                            <iconPacks:PackIconEvaIcons Kind="ArrowUp" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryBrush}"/>
+                                            <hc:NumericUpDown Grid.Column="1" Grid.Row="3"/>
+                                            <iconPacks:PackIconEvaIcons Kind="ArrowDown" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryBrush}"/>
+                                            <hc:NumericUpDown Grid.Column="3" Grid.Row="3" />
+                                        </Grid>
+                                        <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                        <TextBlock Text="对话间距" FontSize="15.151" Margin="4"/>
+                                        <hc:NumericUpDown Margin="4,0,4,4"/>
+                                        <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                        <TextBlock Text="对话宽度" FontSize="15.151" Margin="4"/>
+                                        <hc:NumericUpDown Margin="4,0,4,4"/>
+                                        <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                        <TextBlock Text="对话切割" FontSize="15.151" Margin="4"/>
+                                        <Button Content="启动切割向导" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,0,4,4" Click="OpenCutGuide_Click"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <Border x:Name="CutGuide" Height="0">
+                            <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="38"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="切割向导" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                        <StackPanel>
+                                            <TextBlock Text="切割模式" FontSize="15.151" Margin="4"/>
+                                            <hc:ComboBox Margin="4" SelectedIndex="{Binding SelectedCutModeIndex}">
+                                                <ComboBoxItem>不切割</ComboBoxItem>
+                                                <ComboBoxItem>按标记切割</ComboBoxItem>
+                                                <ComboBoxItem>按长度切割</ComboBoxItem>
+                                            </hc:ComboBox>
+                                            <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            <StackPanel x:Name="LengthMode" Height="0">
+                                                <TextBlock Text="长度模式" FontSize="15.151" Margin="4"/>
+                                                <hc:ComboBox Margin="4,0,4,4" SelectedIndex="{Binding SelectedLengthModeIndex}">
+                                                    <ComboBoxItem>均匀长度</ComboBoxItem>
+                                                    <ComboBoxItem>不均匀长度</ComboBoxItem>
+                                                </hc:ComboBox>
+                                                <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            </StackPanel>
+                                            <StackPanel x:Name="LengthSetting" Height="0">
+                                                <TextBlock Text="设定长度" FontSize="15.151" Margin="4"/>
+                                                <hc:NumericUpDown Margin="4,0,4,4"/>
+                                                <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                            </StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="1"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="取消" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4" Style="{StaticResource ButtonDashedWarning}" Click="CancelCutGuide_Click"/>
+                                                <Border Grid.Column="1" Background="{DynamicResource PrimaryBrush}"/>
+                                                <Button Content="确定" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4" Style="{StaticResource ButtonDashedInfo}" Click="ConfirmCutGuide_Click"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="38"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="导出到文件夹" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <Border Grid.Row="1" CornerRadius="6" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="文件预览" FontSize="15.151" Margin="4"/>
+                                        <TextBlock Text="请先启用切割向导" FontSize="15.151" HorizontalAlignment="Center" Margin="0,4"/>
+                                        <Button Content="生成预览" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4"/>
+                                        <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                        <TextBlock Text="选择文件夹" FontSize="15.151" Margin="4"/>
+                                        <Border Margin="4,0" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1" CornerRadius="4">
+                                            <ScrollViewer Margin="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                                <TextBlock/>
+                                            </ScrollViewer>
+                                        </Border>
+                                        <Button Content="选择文件夹" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4"/>
+                                        <Border Height="1" Background="{DynamicResource PrimaryBrush}"/>
+                                        <TextBlock Text="导出对话" FontSize="15.151" Margin="4"/>
+                                        <TextBlock Text="请先生成预览" FontSize="15.151" HorizontalAlignment="Center" Margin="0,4"/>
+                                        <Button Content="导出" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <Border Margin="8" Background="White" CornerRadius="10" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="38"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="导出为视频" FontSize="18.94" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBlock Text="请先生成预览" Grid.Row="1" FontSize="15.151" HorizontalAlignment="Center"/>
+                                <Button Content="打开视频编辑工具" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Page>
